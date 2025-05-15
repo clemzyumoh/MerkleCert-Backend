@@ -15,10 +15,31 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// ✅ Domains allowed to access your backend
+const allowedOrigins = [
+  "https://merkle-cert.vercel.app",
+  "http://localhost:5173",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "x-wallet-address"],
+  })
+);
+
+
 // Middlewares
 app.use(express.json()); // Parses incoming JSON requests
 app.use(express.urlencoded({ extended: false })); // Allows for URL-encoded bodies
-app.use(cors()); // Enable Cross-Origin Resource Sharing (CORS)
+
 
 // Routes
 app.use("/api", certificateRoutes);
